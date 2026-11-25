@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Campo Harmônico para Iniciantes</title>
+<style>
+:root{
+  --bg:#fff8ee; --ink:#2d2a3e; --muted:#6b6880; --card:#ffffff;
+  --rest:#2bb59b; --rest-bg:#e3f7f2;
+  --prep:#f5a623; --prep-bg:#fff2dc;
+  --tens:#ef5b7b; --tens-bg:#ffe5ea;
+  --res:#7c5cff; --res-bg:#eee9ff;
+  --radius:18px; --shadow:0 6px 18px rgba(60,40,100,.10);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;
+  background-image:radial-gradient(circle at 10% 0%,#ffe9c7 0,transparent 35%),radial-gradient(circle at 95% 10%,#e6defe 0,transparent 35%);
+  background-attachment:fixed}
+.wrap{max-width:1050px;margin:0 auto;padding:16px 14px 50px}
+header{text-align:center;padding:14px 0 6px}
+h1{margin:0;font-size:clamp(1.5rem,5.5vw,2.3rem)}
+header p{margin:6px auto 0;color:var(--muted);max-width:600px}
+h2{font-size:clamp(1.15rem,4vw,1.45rem);margin:0 0 8px;display:flex;gap:8px;align-items:center}
+section{margin-top:22px}
+.panel{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end}
+label{font-weight:700;font-size:.9rem;display:block;margin-bottom:4px}
+select{width:100%;font-size:1.05rem;padding:12px;border-radius:12px;border:2px solid #e3dcf5;background:#fff;color:var(--ink);min-height:48px}
+select:focus,button:focus-visible{outline:3px solid var(--res);outline-offset:2px}
+.msg{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--res-bg);font-size:.92rem;display:none}
+.msg.show{display:block}
+.msg.err{background:var(--tens-bg)}
+.hero{font-size:1.2rem;font-weight:800;margin:0 0 4px}
+.scale{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.note{flex:1 1 60px;min-width:56px;max-width:110px;text-align:center;border-radius:14px;padding:8px 4px;color:#fff;font-weight:800;cursor:pointer;border:0;font-size:1rem;transition:transform .15s}
+.note:active{transform:scale(.95)}
+.note small{display:block;font-weight:600;opacity:.9;font-size:.72rem}
+.g-rest{--c:var(--rest);--bg2:var(--rest-bg)}
+.g-prep{--c:var(--prep);--bg2:var(--prep-bg)}
+.g-tens{--c:var(--tens);--bg2:var(--tens-bg)}
+.note{background:var(--c)}
+.legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:10px}
+.leg{border-radius:14px;padding:10px 12px;background:var(--bg2);border-left:6px solid var(--c);font-size:.93rem}
+.leg b{display:block}
+/* mapa */
+.flow{display:flex;align-items:stretch;gap:6px;margin-top:10px}
+.stage{flex:1;border-radius:16px;padding:10px;text-align:center;background:var(--bg2);border:2px solid var(--c)}
+.stage.g-res{--c:var(--res);--bg2:var(--res-bg)}
+.stage .ico{font-size:1.7rem}
+.stage h3{margin:0;font-size:1rem}
+.stage p{margin:2px 0 6px;font-size:.78rem;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
+.chip{border:0;background:var(--c);color:#fff;font-weight:800;border-radius:999px;padding:6px 12px;font-size:.95rem;cursor:pointer;min-height:34px}
+.arrow{align-self:center;font-size:1.5rem;color:var(--muted)}
+.loop{text-align:center;color:var(--res);font-weight:700;font-size:.9rem;margin-top:8px}
+.thermo{display:flex;align-items:flex-end;gap:6px;height:170px;margin-top:14px;padding:0 2px}
+.bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;cursor:pointer;border:0;background:none;padding:0;color:var(--ink)}
+.bar i{display:block;width:100%;max-width:60px;border-radius:10px 10px 4px 4px;background:var(--c);transition:height .4s}
+.bar span{font-size:.72rem;font-weight:700;margin-top:3px;white-space:nowrap}
+.bar em{font-style:normal;font-size:1.05rem}
+.axis{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-top:4px}
+/* grupos e cards */
+.group{margin-top:16px}
+.group>h3{margin:0 0 8px;padding:8px 12px;border-radius:12px;background:var(--bg2);border-left:6px solid var(--c);font-size:1.05rem}
+.group>h3 small{display:block;font-weight:500;color:var(--muted);font-size:.85rem}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;border-top:8px solid var(--c);display:flex;flex-direction:column;transition:transform .2s, box-shadow .2s}
+.card:hover{transform:translateY(-3px)}
+.card.flash,.card.playing{box-shadow:0 0 0 4px var(--c),var(--shadow);transform:scale(1.02)}
+.card .top{display:flex;justify-content:space-between;align-items:center;padding:12px 14px 0}
+.roman{background:var(--bg2);color:var(--ink);font-weight:800;border-radius:10px;padding:2px 12px;font-size:1.2rem}
+.emoji{font-size:2rem}
+.cname{font-size:2.2rem;font-weight:900;padding:0 14px;line-height:1.1}
+.cname small{font-size:.8rem;font-weight:600;color:var(--muted);margin-left:6px}
+.fn{margin:6px 14px;display:inline-block;align-self:flex-start;background:var(--c);color:#fff;border-radius:999px;padding:3px 12px;font-size:.82rem;font-weight:700}
+.notes{display:flex;gap:6px;padding:0 14px;flex-wrap:wrap}
+.notes span{background:var(--bg2);border-radius:10px;padding:3px 10px;font-weight:700;font-size:.9rem}
+.notes span small{color:var(--muted);font-weight:600}
+.meter{padding:10px 14px 0;font-size:.85rem;font-weight:700}
+.dots{display:flex;gap:4px;margin-top:3px}
+.dots b{flex:1;height:9px;border-radius:5px;background:#eae6f3}
+.dots b.on{background:var(--c)}
+.why{padding:8px 14px;margin:0;font-size:.93rem}
+.more{margin:0 14px 8px;padding:8px 10px;border-radius:10px;background:var(--bg2);font-size:.85rem;display:none}
+.more.open{display:block}
+.btns{display:flex;gap:8px;padding:0 14px 14px;margin-top:auto}
+button.b{flex:1;border:0;border-radius:12px;padding:10px;font-weight:700;font-size:.92rem;cursor:pointer;min-height:44px;background:var(--c);color:#fff}
+button.b.alt{background:#fff;color:var(--ink);border:2px solid #e3dcf5;flex:0 0 auto;padding:10px 14px}
+button.b:active{transform:scale(.97)}
+/* progressões */
+.progs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.prog{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;border-top:8px solid var(--res)}
+.prog h4{margin:0;font-size:1.15rem}
+.prog .ch{font-size:1.4rem;font-weight:900;margin:6px 0;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.prog .ch span{background:var(--res-bg);border-radius:10px;padding:2px 10px}
+.prog .ch i{font-style:normal;color:var(--muted)}
+.prog p{margin:0 0 10px;font-size:.9rem;color:var(--muted)}
+.prog .b{background:var(--res);width:100%}
+details{margin-top:10px;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:12px 16px}
+summary{font-weight:800;cursor:pointer;min-height:32px}
+footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:26px}
+@media(max-width:640px){
+  .controls{grid-template-columns:1fr 1fr;gap:8px}
+  .flow{flex-direction:column}
+  .arrow{transform:rotate(90deg);padding:0}
+  .cards{grid-template-columns:1fr}
+  .thermo{height:150px;gap:3px}
+  .bar span{font-size:.62rem}
+  .wrap{padding:10px 10px 40px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>🎵 Campo Harmônico Fácil</h1>
+  <p>Escolha um tom e veja, de forma visual, quais acordes combinam entre si e quais dão sensação de descanso ou de tensão.</p>
+</header>
+
+<section class="panel">
+  <div class="controls">
+    <div><label for="tom">🎼 Tom</label><select id="tom"></select></div>
+    <div><label for="modo">🌗 Modo</label>
+      <select id="modo"><option value="maior">Maior (alegre)</option><option value="menor">Menor (emotivo)</option></select></div>
+  </div>
+  <div id="msg" class="msg" role="status" aria-live="polite"></div>
+</section>
+
+<section class="panel">
+  <h2>🤔 O que é campo harmônico?</h2>
+  <p style="margin:0">Imagine uma <b>caixa de tintas</b> escolhida para uma música. O <b>campo harmônico</b> é essa caixa: os 7 acordes que “moram” no mesmo tom e combinam entre si. Cada acorde é construído sobre uma nota da escala, empilhando notas de duas em duas (1ª, 3ª e 5ª). Alguns acordes dão sensação de <b>descanso</b>, outros de <b>passeio</b> e outros de <b>suspense</b>, e é essa mistura que deixa a música interessante.</p>
+</section>
+
+<section class="panel">
+  <h2>🪜 Escala de <span id="escalaTitulo"></span></h2>
+  <p style="margin:0;color:var(--muted);font-size:.93rem">Escala é a sequência de 7 notas do tom. Cada acorde nasce de uma dessas notas. Toque numa nota para ouvi-la.</p>
+  <div class="scale" id="escala"></div>
+</section>
+
+<section class="panel">
+  <h2>🗺️ Mapa de tensão</h2>
+  <p style="margin:0;color:var(--muted);font-size:.93rem">O caminho típico de uma música: sai de casa, se afasta, cria suspense e volta para casa. Toque num acorde para ir até o card dele.</p>
+  <div class="flow" id="fluxo"></div>
+  <div class="loop">🔁 E o ciclo recomeça!</div>
+  <div class="thermo" id="termo" aria-label="Termômetro de tensão de cada acorde"></div>
+  <div class="axis"><span>😌 Mais calmo</span><span>Mais tenso 🚀</span></div>
+</section>
+
+<section>
+  <h2>🃏 Acordes do campo harmônico</h2>
+  <div id="grupos"></div>
+</section>
+
+<section>
+  <h2>🎶 Progressões para experimentar</h2>
+  <p style="margin:0 0 10px;color:var(--muted);font-size:.93rem">Progressão é uma sequência de acordes. Aperte o botão e ouça a história de tensão e repouso acontecendo.</p>
+  <div class="progs" id="progs"></div>
+</section>
+
+<section class="panel">
+  <h2>📖 Legenda: quem é quem?</h2>
+  <div class="legend">
+    <div class="leg g-rest"><b>🏠 Tônica = Repouso</b>É a “casa” do tom. Passa sensação de estabilidade e fim de frase.</div>
+    <div class="leg g-prep"><b>🧭 Subdominante = Preparação</b>É o passeio para longe de casa. Cria movimento e curiosidade.</div>
+    <div class="leg g-tens"><b>⚡ Dominante = Tensão</b>É o suspense. Dá vontade forte de voltar para casa.</div>
+    <div class="leg" style="--c:var(--res);--bg2:var(--res-bg)"><b>🎯 Resolução</b>É o momento em que a tensão se desfaz e voltamos ao acorde de repouso.</div>
+  </div>
+  <p style="font-size:.88rem;color:var(--muted);margin:10px 0 0">Os números romanos mostram a posição do acorde no campo. <b>Maiúsculo</b> (IV) = acorde maior, <b>minúsculo</b> (ii) = acorde menor e <b>°</b> = diminuto (soa mais “instável”).</p>
+</section>
+
+<details id="varMenor" style="display:none">
+  <summary>🌙 E as outras versões do menor?</summary>
+  <p>Aqui usamos o <b>menor natural</b>, o mais simples. Existem duas variações, que você pode conhecer depois:</p>
+  <p><b>Menor harmônica:</b> sobe a 7ª nota meio tom. O acorde da 5ª nota vira <b>maior</b> (<span id="vHarm"></span>), com mais tensão e uma resolução mais forte para o primeiro acorde.</p>
+  <p><b>Menor melódica:</b> sobe a 6ª e a 7ª notas ao subir a melodia, deixando o caminho até a tônica mais suave.</p>
+</details>
+
+<footer>Feito para aprender brincando 💛 · Funciona offline</footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+var SOL=["Dó","Ré","Mi","Fá","Sol","Lá","Si"], LET=["C","D","E","F","G","A","B"], NAT=[0,2,4,5,7,9,11];
+var SHARP="♯", FLAT="♭";
+var TONS=["Dó","Dó♯ / Ré♭","Ré","Ré♯ / Mi♭","Mi","Fá","Fá♯ / Sol♭","Sol","Sol♯ / Lá♭","Lá","Lá♯ / Si♭","Si"];
+var KEY_MAJ=[[0,0],[1,-1],[1,0],[2,-1],[2,0],[3,0],[3,1],[4,0],[5,-1],[5,0],[6,-1],[6,0]];
+var KEY_MIN=[[0,0],[0,1],[1,0],[2,-1],[2,0],[3,0],[3,1],[4,0],[4,1],[5,0],[6,-1],[6,0]];
+var IV={maior:[0,2,4,5,7,9,11],menor:[0,2,3,5,7,8,10]};
+var ROM={maior:["I","ii","iii","IV","V","vi","vii°"],menor:["i","ii°","III","iv","v","VI","VII"]};
+var GROUPS={
+  rest:{cls:"g-rest",ico:"🏠",nome:"Repouso",sub:"Tônica: lugar de descanso, a “casa” da música",fn:"Tônica · Repouso"},
+  prep:{cls:"g-prep",ico:"🧭",nome:"Afastamento / Preparação",sub:"Subdominante: sai de casa e prepara o suspense",fn:"Subdominante · Preparação"},
+  tens:{cls:"g-tens",ico:"⚡",nome:"Tensão / Retorno",sub:"Dominante: cria vontade de voltar para casa",fn:"Dominante · Tensão"}
+};
+var LEVELS={1:["😌","Repouso"],2:["🙂","Leve afastamento"],3:["🤔","Preparação"],4:["😬","Tensão"],5:["🚀","Pede resolução!"]};
+var INFO={
+ maior:[
+  {g:"rest",l:1,s:"A “casa” da música: começa e termina aqui, com sensação de chegada.",m:"Todos os outros acordes parecem puxar de volta para ele. A maioria das músicas começa e termina no I."},
+  {g:"prep",l:3,s:"Prepara o terreno: costuma vir antes do V, como um “respirar fundo”.",m:"A sequência ii–V–I é uma das mais usadas na MPB, no pop e no jazz."},
+  {g:"rest",l:2,s:"Parente do repouso: calmo, porém mais sonhador que o I.",m:"Divide notas com o I, então pode substituí-lo suavemente. Aparece ligando o I ao IV ou ao vi."},
+  {g:"prep",l:2,s:"O primeiro passeio para longe de casa: soa aberto e brilhante.",m:"É o acorde mais comum depois do I. Muitos refrões usam I–IV–V."},
+  {g:"tens",l:5,s:"O suspense: cria uma vontade forte de voltar ao I.",m:"É o acorde de maior tensão do campo. Quando volta ao I, sentimos a resolução 🎯."},
+  {g:"rest",l:2,s:"O “primo triste” do I: repouso com um toque de melancolia.",m:"É o relativo menor. Funciona como um descanso alternativo, muito usado em baladas."},
+  {g:"tens",l:4,s:"Instável e cheio de tensão; quase sempre pede para resolver no I.",m:"Soa parecido com o V, mas é mais raro. Costuma aparecer como passagem rápida."}
+ ],
+ menor:[
+  {g:"rest",l:1,s:"A “casa” em clima emotivo: onde a música começa e descansa.",m:"É o centro do tom menor. Tudo gira em volta dele."},
+  {g:"prep",l:3,s:"Preparação instável, comum antes do v ou do V.",m:"É um acorde diminuto: soa meio “nebuloso” e pede movimento."},
+  {g:"rest",l:2,s:"Repouso claro e luminoso: o acorde maior “relativo”.",m:"Dá uma respirada de esperança no meio do clima menor."},
+  {g:"prep",l:3,s:"Afastamento melancólico, clássico antes do v ou de voltar ao i.",m:"É o passeio mais típico do tom menor."},
+  {g:"tens",l:4,s:"Tensão mais suave: pede a volta ao i, sem tanta força.",m:"No menor natural é menor. Na menor harmônica ele vira maior e fica bem mais tenso."},
+  {g:"rest",l:2,s:"Repouso emotivo, muito usado em músicas épicas e baladas.",m:"Fica entre o descanso e o passeio. Combina bem antes do VII ou do V."},
+  {g:"tens",l:4,s:"Um “empurrão” que leva de volta ao i, comum no rock e no pop.",m:"A sequência VII → i dá uma sensação de energia e vitória."}
+ ]
+};
+var PROGS={
+ maior:[
+  {d:[0,3,4,0],t:"Clássica e direta",p:"Sai de casa, passeia, cria o suspense e volta. É a história completa em 4 acordes."},
+  {d:[0,5,3,4],t:"Romântica",p:"Repouso, um toque de melancolia, passeio e suspense. Muito usada em baladas dos anos 50."},
+  {d:[0,4,5,3],t:"Popzão",p:"Está em milhares de músicas de sucesso. Alterna calma e emoção."}
+ ],
+ menor:[
+  {d:[0,3,4,0],t:"Menor clássica",p:"Sai de casa pelo iv, cria tensão no v e volta ao i."},
+  {d:[0,5,2,6],t:"Épica",p:"Muito usada em trilhas e músicas dramáticas. Sobe e vai ganhando força."},
+  {d:[0,6,5,6],t:"Rock / Pop",p:"Vai e volta entre acordes vizinhos, criando um balanço marcante."}
+ ]
+};
+
+var $=function(id){return document.getElementById(id)};
+var selTom=$("tom"), selModo=$("modo"), state=null, ctx=null, timers=[];
+
+TONS.forEach(function(n,i){var o=document.createElement("option");o.value=i;o.textContent=n;selTom.appendChild(o)});
+selTom.value="0";
+
+function acc(a){return a===0?"":a===1?SHARP:a===-1?FLAT:a===2?"𝄪":a===-2?"𝄫":"?"}
+function noteObj(letter,a){return {sol:SOL[letter]+acc(a),cif:LET[letter]+acc(a),pc:((NAT[letter]+a)%12+12)%12}}
+
+function build(tom,modo){
+  var key=(modo==="maior"?KEY_MAJ:KEY_MIN)[tom];
+  var L=key[0], tonicPc=((NAT[L]+key[1])%12+12)%12;
+  var scale=[];
+  for(var i=0;i<7;i++){
+    var letter=(L+i)%7, target=(tonicPc+IV[modo][i])%12;
+    var diff=((target-NAT[letter]+18)%12)-6;
+    scale.push(noteObj(letter,diff));
+  }
+  var chords=scale.map(function(r,i){
+    var n3=scale[(i+2)%7], n5=scale[(i+4)%7];
+    var t=(n3.pc-r.pc+12)%12, f=(n5.pc-r.pc+12)%12;
+    var q=(t===4&&f===7)?"":(t===3&&f===7)?"m":(t===3&&f===6)?"dim":"?";
+    var qn=q===""?"maior":q==="m"?"menor":"diminuto";
+    return {name:r.cif+q,root:r,notes:[r,n3,n5],q:q,qn:qn,roman:ROM[modo][i],idx:i,info:INFO[modo][i]};
+  });
+  return {scale:scale,chords:chords,modo:modo,tom:tom};
+}
+
+function msg(t,err){var m=$("msg");if(!t){m.className="msg";m.textContent="";return}m.className="msg show"+(err?" err":"");m.textContent=t}
+
+function update(){
+  var tom=parseInt(selTom.value,10), modo=selModo.value;
+  if(isNaN(tom)||tom<0||tom>11){tom=0;selTom.value="0";msg("Ops! Esse tom não existe, então voltei para Dó. 😊",true)}
+  else if(modo!=="maior"&&modo!=="menor"){modo="maior";selModo.value="maior";msg("Modo não reconhecido, então escolhi Maior. 😊",true)}
+  else {
+    var rel=(modo==="maior"?KEY_MAJ:KEY_MIN)[tom];
+    var nome=SOL[rel[0]]+acc(rel[1]);
+    msg("Mostrando o campo harmônico de "+nome+" "+modo+". "+(modo==="maior"?"Soa mais alegre e brilhante. ☀️":"Soa mais sério e emotivo. 🌙"));
+  }
+  state=build(tom,modo);
+  render();
+}
+
+function render(){
+  var s=state, rel=(s.modo==="maior"?KEY_MAJ:KEY_MIN)[s.tom];
+  var tonica=SOL[rel[0]]+acc(rel[1]);
+  $("escalaTitulo").textContent=tonica+" "+s.modo;
+  // escala
+  $("escala").innerHTML=s.scale.map(function(n,i){
+    var g=GROUPS[s.chords[i].info.g];
+    return '<button class="note '+g.cls+'" data-note="'+i+'" title="Grau '+(i+1)+' da escala. Toque para ouvir.">'+n.sol+'<small>'+n.cif+' · grau '+(i+1)+'</small></button>';
+  }).join("");
+  // fluxo
+  var by={rest:[],prep:[],tens:[]};
+  s.chords.forEach(function(c){by[c.info.g].push(c)});
+  function chips(arr,cls){return '<div class="chips '+cls+'">'+arr.map(function(c){return '<button class="chip" data-go="'+c.idx+'" title="'+c.roman+' · '+c.name+'">'+c.name+'</button>'}).join("")+'</div>'}
+  var c0=s.chords[0];
+  $("fluxo").innerHTML=
+   '<div class="stage g-rest"><div class="ico">🏠</div><h3>1. Repouso</h3><p>Estou em casa</p>'+chips(by.rest,"g-rest")+'</div><div class="arrow">➜</div>'+
+   '<div class="stage g-prep"><div class="ico">🧭</div><h3>2. Afastamento</h3><p>Saio para passear</p>'+chips(by.prep,"g-prep")+'</div><div class="arrow">➜</div>'+
+   '<div class="stage g-tens"><div class="ico">⚡</div><h3>3. Tensão</h3><p>Que suspense!</p>'+chips(by.tens,"g-tens")+'</div><div class="arrow">➜</div>'+
+   '<div class="stage g-res"><div class="ico">🎯</div><h3>4. Resolução</h3><p>Voltei para casa</p><div class="chips g-res"><button class="chip" data-go="0">'+c0.name+'</button></div></div>';
+  // termômetro
+  $("termo").innerHTML=s.chords.map(function(c){
+    var g=GROUPS[c.info.g];
+    return '<button class="bar '+g.cls+'" data-go="'+c.idx+'" title="'+c.name+' ('+c.roman+'): '+LEVELS[c.info.l][1]+'"><em>'+LEVELS[c.info.l][0]+'</em><i style="height:'+(c.info.l*18)+'%"></i><span>'+c.roman+'</span><span style="font-weight:600;color:var(--muted)">'+c.name+'</span></button>';
+  }).join("");
+  // grupos
+  var html="";
+  ["rest","prep","tens"].forEach(function(k){
+    var g=GROUPS[k];
+    html+='<div class="group '+g.cls+'"><h3>'+g.ico+' '+g.nome+'<small>'+g.sub+'</small></h3><div class="cards">'+by[k].map(function(c){return card(c,g)}).join("")+'</div></div>';
+  });
+  $("grupos").innerHTML=html;
+  // progressões
+  $("progs").innerHTML=PROGS[s.modo].map(function(p,pi){
+    var rom=p.d.map(function(d){return s.chords[d].roman}).join(" – ");
+    var ch=p.d.map(function(d){return '<span>'+s.chords[d].name+'</span>'}).join("<i>→</i>");
+    return '<div class="prog"><h4>'+rom+' · '+p.t+'</h4><div class="ch">'+ch+'</div><p>'+p.p+'</p><button class="b" data-prog="'+pi+'">▶️ Ouvir progressão</button></div>';
+  }).join("");
+  // menor
+  var vm=$("varMenor");
+  if(s.modo==="menor"){
+    vm.style.display="block";
+    var r5=s.scale[4];
+    var v5=s.chords[4];
+    $("vHarm").textContent=r5.cif+" maior (em vez de "+v5.name+")";
+  } else vm.style.display="none";
+}
+
+function card(c,g){
+  var L=LEVELS[c.info.l], dots="";
+  for(var i=1;i<=5;i++)dots+='<b class="'+(i<=c.info.l?"on":"")+'"></b>';
+  var tip=c.roman+" ("+c.name+"): "+g.fn+". "+c.info.s;
+  return '<article class="card '+g.cls+'" id="card'+c.idx+'" title="'+tip.replace(/"/g,"&quot;")+'">'+
+   '<div class="top"><span class="roman">'+c.roman+'</span><span class="emoji" aria-hidden="true">'+L[0]+'</span></div>'+
+   '<div class="cname">'+c.name+'<small>acorde '+c.qn+'</small></div>'+
+   '<span class="fn">'+g.ico+' '+g.fn+'</span>'+
+   '<div class="notes">'+c.notes.map(function(n){return '<span>'+n.sol+' <small>'+n.cif+'</small></span>'}).join("")+'</div>'+
+   '<div class="meter">Tensão '+c.info.l+'/5 · '+L[1]+'<div class="dots">'+dots+'</div></div>'+
+   '<p class="why">💡 '+c.info.s+'</p>'+
+   '<div class="more" id="more'+c.idx+'">📚 '+c.info.m+'</div>'+
+   '<div class="btns"><button class="b" data-play="'+c.idx+'">🔊 Ouvir</button><button class="b alt" data-more="'+c.idx+'" aria-label="Saiba mais" title="Saiba mais">❓</button></div>'+
+  '</article>';
+}
+
+/* ÁUDIO */
+function getCtx(){
+  try{
+    if(!ctx){var AC=window.AudioContext||window.webkitAudioContext;if(!AC)throw 0;ctx=new AC()}
+    if(ctx.state==="suspended")ctx.resume();
+    return ctx;
+  }catch(e){msg("Seu navegador não suporta áudio aqui. Os acordes continuam visíveis. 🙂",true);return null}
+}
+function freq(m){return 440*Math.pow(2,(m-69)/12)}
+function tone(f,t,dur,vol,type){
+  var o=ctx.createOscillator(),g=ctx.createGain();
+  o.type=type;o.frequency.value=f;
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(vol,t+0.03);
+  g.gain.exponentialRampToValueAtTime(vol*0.55,t+dur*0.5);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(g);g.connect(ctx.destination);
+  o.start(t);o.stop(t+dur+0.05);
+}
+function playChord(c,t,dur){
+  var root=55+(((c.root.pc-55)%12)+12)%12, prev=root, ms=[root];
+  c.notes.slice(1).forEach(function(n){var m=prev+1;while(((m%12)+12)%12!==n.pc)m++;ms.push(m);prev=m});
+  ms.forEach(function(m){tone(freq(m),t,dur,0.13,"triangle");tone(freq(m),t,dur,0.05,"sine")});
+  tone(freq(root-12),t,dur,0.12,"sine");
+}
+function playNote(pc){
+  if(!getCtx())return;
+  var m=60+(((pc-60)%12)+12)%12;
+  tone(freq(m),ctx.currentTime,1.0,0.2,"triangle");
+}
+function highlight(idx,on){var e=$("card"+idx);if(e)e.classList.toggle("playing",on)}
+function clearTimers(){timers.forEach(clearTimeout);timers=[];document.querySelectorAll(".playing").forEach(function(e){e.classList.remove("playing")})}
+function playOne(idx){
+  if(!getCtx())return;clearTimers();
+  playChord(state.chords[idx],ctx.currentTime+0.02,1.6);
+  highlight(idx,true);timers.push(setTimeout(function(){highlight(idx,false)},1500));
+}
+function playProg(pi){
+  if(!getCtx())return;clearTimers();
+  var p=PROGS[state.modo][pi], t0=ctx.currentTime+0.05, step=1.1;
+  p.d.forEach(function(d,i){
+    playChord(state.chords[d],t0+i*step,step*0.95);
+    timers.push(setTimeout(function(){document.querySelectorAll(".playing").forEach(function(e){e.classList.remove("playing")});highlight(d,true)},i*step*1000));
+  });
+  timers.push(setTimeout(function(){document.querySelectorAll(".playing").forEach(function(e){e.classList.remove("playing")})},p.d.length*step*1000));
+}
+
+/* EVENTOS */
+document.addEventListener("click",function(e){
+  var b=e.target.closest("button");if(!b||!state)return;
+  if(b.dataset.play!==undefined)playOne(+b.dataset.play);
+  else if(b.dataset.prog!==undefined)playProg(+b.dataset.prog);
+  else if(b.dataset.note!==undefined)playNote(state.scale[+b.dataset.note].pc);
+  else if(b.dataset.more!==undefined){
+    var m=$("more"+b.dataset.more);m.classList.toggle("open");
+  }
+  else if(b.dataset.go!==undefined){
+    var c=$("card"+b.dataset.go);
+    if(c){c.scrollIntoView({behavior:"smooth",block:"center"});c.classList.add("flash");setTimeout(function(){c.classList.remove("flash")},1400)}
+  }
+});
+selTom.addEventListener("change",update);
+selModo.addEventListener("change",update);
+update();
+})();
+</script>
+</body>
+</html>
